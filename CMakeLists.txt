@@ -584,15 +584,17 @@ endforeach()
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/embed_test_data_args.txt"
      "${EMBED_TEST_DATA_ARGS}")
 
-add_custom_command(
-  OUTPUT crypto_test_data.cc
-  COMMAND ${GO_EXECUTABLE} run util/embed_test_data.go -file-list
-          "${CMAKE_CURRENT_BINARY_DIR}/embed_test_data_args.txt" >
-          "${CMAKE_CURRENT_BINARY_DIR}/crypto_test_data.cc"
-  DEPENDS util/embed_test_data.go ${CRYPTO_TEST_DATA}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+if(NOT BORINGSSL_DISABLE_TEST)
+    add_custom_command(
+      OUTPUT crypto_test_data.cc
+      COMMAND ${GO_EXECUTABLE} run util/embed_test_data.go -file-list
+              "${CMAKE_CURRENT_BINARY_DIR}/embed_test_data_args.txt" >
+              "${CMAKE_CURRENT_BINARY_DIR}/crypto_test_data.cc"
+      DEPENDS util/embed_test_data.go ${CRYPTO_TEST_DATA}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(crypto_test_data OBJECT crypto_test_data.cc)
+    add_library(crypto_test_data OBJECT crypto_test_data.cc)
+endif()
 
 add_subdirectory(crypto)
 add_subdirectory(ssl)
